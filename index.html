@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATA DE REUNIÃO - FKSA</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f3f3;
+      color: #2f2f33;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 28px 28px 10px;
+      border-bottom: 1px solid #ececec;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: #2f2f33;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: #6e6e75;
+      font-size: 14px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .badge {
+      background: #f0f0f1;
+      color: #3b3b40;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .content {
+      padding: 24px 28px 28px;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #2f2f33;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      border: 1px solid #d9d9de;
+      border-radius: 16px;
+      background: #fff;
+      padding: 14px 16px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: #8f7f7b;
+      box-shadow: 0 0 0 4px rgba(143, 127, 123, 0.12);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    #relato {
+      min-height: 220px;
+    }
+
+    .upload-box {
+      border: 1px dashed #cfcfd5;
+      background: #fafafa;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .upload-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .upload-text strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .upload-text span {
+      font-size: 13px;
+      color: #6e6e75;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #2f2f33;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .upload-btn:hover {
+      opacity: 0.95;
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .preview-card {
+      border: 1px solid #e5e5ea;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    .preview-card img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+      background: #f3f3f3;
+    }
+
+    .preview-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .preview-name {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .preview-name strong {
+      display: block;
+      font-size: 14px;
+      color: #2f2f33;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .preview-name span {
+      font-size: 12px;
+      color: #7b7b82;
+    }
+
+    .remove-btn {
+      border: none;
+      background: #f4f4f6;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .remove-btn:hover {
+      background: #ebebef;
+    }
+
+    .messages {
+      min-height: 24px;
+      margin-top: 8px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .error {
+      color: #c62828;
+    }
+
+    .success {
+      color: #1f8f4d;
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #ececec;
+      padding-top: 18px;
+      margin-top: 10px;
+    }
+
+    .progress {
+      font-size: 14px;
+      color: #6e6e75;
+    }
+
+    .generate-btn {
+      border: none;
+      background: #2f2f33;
+      color: white;
+      border-radius: 16px;
+      padding: 14px 22px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+    }
+
+    .generate-btn:hover {
+      opacity: 0.96;
+    }
+
+    .generate-btn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    .empty-anexos {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #f8f8f9;
+      color: #7a7a81;
+      font-size: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding: 14px;
+      }
+
+      .header,
+      .content {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <div class="title-row">
+            <div class="icon-box">📝</div>
+            <div>
+              <h1>ATA DE REUNIÃO</h1>
+              <p class="subtitle">
+                Preencha poucos campos e gere um PDF com identidade visual inspirada na FKSA.
+              </p>
+            </div>
+          </div>
+
+          <div class="badges">
+            <span class="badge">Fluxo simples</span>
+            <span class="badge">PDF A4</span>
+            <span class="badge">Com logo da marca</span>
+            <span class="badge">Anexos de imagem</span>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="field">
+            <label for="participantes">Participantes</label>
+            <textarea id="participantes" placeholder="Ex.: Ana Souza, Carlos Lima, Mariana Rocha"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="pauta">Pauta / Objetivo</label>
+            <textarea id="pauta" placeholder="Ex.: Definição de escopo, alinhamento de etapas e próximos marcos"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="relato">Relato da Reunião</label>
+            <textarea id="relato" placeholder="Escreva aqui o resumo da conversa, decisões tomadas, pendências e próximos passos."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="anexos">Anexos (imagens)</label>
+
+            <div class="upload-box">
+              <div class="upload-actions">
+                <div class="upload-text">
+                  <strong>Envie imagens JPG ou PNG</strong>
+                  <span>As imagens serão adicionadas em páginas extras no PDF.</span>
+                </div>
+
+                <label class="upload-btn" for="anexos">
+                  📎 Selecionar imagens
+                </label>
+                <input
+                  id="anexos"
+                  class="hidden-input"
+                  type="file"
+                  accept="image/png,image/jpeg"
+                  multiple
+                />
+              </div>
+
+              <div id="anexosVazio" class="empty-anexos">
+                Nenhuma imagem anexada até o momento.
+              </div>
+
+              <div id="previewGrid" class="preview-grid"></div>
+            </div>
+          </div>
+
+          <div id="messages" class="messages"></div>
+
+          <div class="footer-actions">
+            <div id="progress" class="progress">Preenchimento: 0%</div>
+            <button id="generateBtn" class="generate-btn">Gerar PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { jsPDF } = window.jspdf;
+
+    const LOGO_PATH = "logo-fksa.jpg";
+    const MAX_FILES = 10;
+    const MAX_FILE_MB = 12;
+
+    const participantesEl = document.getElementById("participantes");
+    const pautaEl = document.getElementById("pauta");
+    const relatoEl = document.getElementById("relato");
+    const anexosEl = document.getElementById("anexos");
+    const previewGridEl = document.getElementById("previewGrid");
+    const anexosVazioEl = document.getElementById("anexosVazio");
+    const messagesEl = document.getElementById("messages");
+    const progressEl = document.getElementById("progress");
+    const generateBtnEl = document.getElementById("generateBtn");
+
+    let attachments = [];
+
+    function setMessage(text, type) {
+      messagesEl.textContent = text || "";
+      messagesEl.className = "messages";
+      if (type) messagesEl.classList.add(type);
+    }
+
+    function updateProgress() {
+      const fields = [
+        participantesEl.value.trim(),
+        pautaEl.value.trim(),
+        relatoEl.value.trim()
+      ];
+      const filled = fields.filter(Boolean).length;
+      const percent = Math.round((filled / fields.length) * 100);
+      progressEl.textContent = `Preenchimento: ${percent}%`;
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderAttachments() {
+      previewGridEl.innerHTML = "";
+
+      if (!attachments.length) {
+        anexosVazioEl.style.display = "block";
+        return;
+      }
+
+      anexosVazioEl.style.display = "none";
+
+      attachments.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "preview-card";
+
+        card.innerHTML = `
+          <img src="${item.previewUrl}" alt="${escapeHtml(item.name)}">
+          <div class="preview-info">
+            <div class="preview-name">
+              <strong title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</strong>
+              <span>Será incluída no PDF</span>
+            </div>
+            <button class="remove-btn" data-id="${item.id}" title="Remover">✕</button>
+          </div>
+        `;
+
+        previewGridEl.appendChild(card);
+      });
+
+      previewGridEl.querySelectorAll(".remove-btn").forEach((btn) => {
+        btn.addEventListener("click", (event) => {
+          const id = event.currentTarget.getAttribute("data-id");
+          const target = attachments.find((item) => item.id === id);
+          if (target) URL.revokeObjectURL(target.previewUrl);
+          attachments = attachments.filter((item) => item.id !== id);
+          renderAttachments();
+        });
+      });
+    }
+
+    function loadFileAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Não foi possível ler a imagem."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageDimensions(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          resolve({ width: img.width, height: img.height });
+        };
+        img.onerror = () => reject(new Error("Não foi possível carregar a imagem anexada."));
+        img.src = src;
+      });
+    }
+
+    function splitTextSafe(doc, text, maxWidth) {
+      return doc.splitTextToSize(text || "—", maxWidth);
+    }
+
+    async function loadLogoDataUrl() {
+      const response = await fetch(LOGO_PATH);
+      if (!response.ok) {
+        throw new Error("Não foi possível carregar o logo. Salve o arquivo como logo-fksa.jpg na mesma pasta do HTML.");
+      }
+      const blob = await response.blob();
+      return await loadFileAsDataURL(blob);
+    }
+
+    function drawHeader(doc, logoDataUrl) {
+      const pageWidth = doc.internal.pageSize.getWidth();
+
+      doc.setFillColor(245, 244, 244);
+      doc.rect(0, 0, pageWidth, 34, "F");
+
+      doc.setFillColor(52, 52, 58);
+      doc.rect(0, 0, pageWidth, 6, "F");
+
+      doc.addImage(logoDataUrl, "JPEG", 15, 10, 56, 18);
+
+      doc.setTextColor(52, 52, 58);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(19);
+      doc.text("ATA DE REUNIÃO", 15, 42);
+
+      doc.setTextColor(143, 127, 123);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text("Documento gerado automaticamente com identidade visual da FKSA.", 15, 48);
+
+      doc.setDrawColor(143, 127, 123);
+      doc.setLineWidth(0.4);
+      doc.line(15, 53, pageWidth - 15, 53);
+    }
+
+    function drawFooter(doc) {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      doc.setDrawColor(225, 225, 228);
+      doc.setLineWidth(0.3);
+      doc.line(15, pageHeight - 14, pageWidth - 15, pageHeight - 14);
+
+      doc.setTextColor(143, 127, 123);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text("FKSA Arquitetura Design", 15, pageHeight - 8);
+
+      doc.setFont("helvetica", "normal");
+      doc.text("Ata de reunião", pageWidth - 40, pageHeight - 8);
+    }
+
+    function drawSection(doc, title, text, y, options = {}) {
+      const {
+        pageWidth = doc.internal.pageSize.getWidth(),
+        marginX = 15,
+        lineHeight = 6.2
+      } = options;
+
+      const contentWidth = pageWidth - marginX * 2;
+
+      doc.setTextColor(52, 52, 58);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text(title, marginX, y);
+
+      let currentY = y + 7;
+
+      doc.setTextColor(47, 47, 51);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+
+      const lines = splitTextSafe(doc, text || "—", contentWidth);
+      lines.forEach((line) => {
+        doc.text(line, marginX, currentY);
+        currentY += lineHeight;
+      });
+
+      return currentY + 4;
+    }
+
+    async function addAttachmentPage(doc, logoDataUrl, attachment, index) {
+      doc.addPage();
+
+      drawHeader(doc, logoDataUrl);
+      drawFooter(doc);
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 15;
+      const frameY = 66;
+      const frameHeight = pageHeight - 94;
+      const frameWidth = pageWidth - marginX * 2;
+
+      doc.setTextColor(52, 52, 58);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text(`ANEXO ${index + 1}`, marginX, 62);
+
+      doc.setTextColor(110, 110, 117);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text(attachment.name, marginX, 68);
+
+      doc.setDrawColor(220, 220, 224);
+      doc.setLineWidth(0.5);
+      doc.rect(marginX, 74, frameWidth, frameHeight - 14);
+
+      const dims = await loadImageDimensions(attachment.dataUrl);
+      const maxW = frameWidth - 10;
+      const maxH = frameHeight - 24;
+
+      let imgW = dims.width;
+      let imgH = dims.height;
+
+      const ratio = Math.min(maxW / imgW, maxH / imgH);
+      imgW *= ratio;
+      imgH *= ratio;
+
+      const imgX = marginX + (frameWidth - imgW) / 2;
+      const imgY = 79 + (maxH - imgH) / 2;
+
+      const format = attachment.file.type === "image/png" ? "PNG" : "JPEG";
+      doc.addImage(attachment.dataUrl, format, imgX, imgY, imgW, imgH);
+    }
+
+    async function generatePdf() {
+      const participantes = participantesEl.value.trim();
+      const pauta = pautaEl.value.trim();
+      const relato = relatoEl.value.trim();
+
+      if (!participantes || !pauta || !relato) {
+        throw new Error("Preencha os 3 campos antes de gerar o PDF.");
+      }
+
+      const logoDataUrl = await loadLogoDataUrl();
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
+
+      drawHeader(doc, logoDataUrl);
+      drawFooter(doc);
+
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let y = 63;
+
+      y = drawSection(doc, "Participantes", participantes, y);
+      y = drawSection(doc, "Pauta / Objetivo", pauta, y);
+
+      const relatoLines = splitTextSafe(doc, relato, 180);
+      const maxRelatoY = pageHeight - 24;
+
+      doc.setTextColor(52, 52, 58);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text("Relato da Reunião", 15, y);
+
+      y += 7;
+
+      doc.setTextColor(47, 47, 51);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+
+      for (let i = 0; i < relatoLines.length; i++) {
+        if (y > maxRelatoY) {
+          doc.addPage();
+          drawHeader(doc, logoDataUrl);
+          drawFooter(doc);
+
+          doc.setTextColor(52, 52, 58);
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(15);
+          doc.text("CONTINUAÇÃO — RELATO DA REUNIÃO", 15, 42);
+
+          y = 52;
+
+          doc.setTextColor(47, 47, 51);
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(11);
+        }
+
+        doc.text(relatoLines[i], 15, y);
+        y += 6.2;
+      }
+
+      for (let i = 0; i < attachments.length; i++) {
+        await addAttachmentPage(doc, logoDataUrl, attachments[i], i);
+      }
+
+      doc.save("ata-de-reuniao.pdf");
+    }
+
+    anexosEl.addEventListener("change", async (event) => {
+      setMessage("");
+
+      const files = Array.from(event.target.files || []);
+      if (!files.length) return;
+
+      if (attachments.length >= MAX_FILES) {
+        setMessage(`Limite máximo de ${MAX_FILES} imagens atingido.`, "error");
+        event.target.value = "";
+        return;
+      }
+
+      const remaining = MAX_FILES - attachments.length;
+      const selected = files.slice(0, remaining);
+
+      for (const file of selected) {
+        const allowed = ["image/jpeg", "image/png"];
+        if (!allowed.includes(file.type)) {
+          setMessage("Somente imagens JPG e PNG podem ser anexadas.", "error");
+          continue;
+        }
+
+        if (file.size > MAX_FILE_MB * 1024 * 1024) {
+          setMessage(`Cada imagem deve ter no máximo ${MAX_FILE_MB} MB.`, "error");
+          continue;
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        const dataUrl = await loadFileAsDataURL(file);
+
+        attachments.push({
+          id: `${file.name}-${file.lastModified}-${Math.random().toString(36).slice(2, 9)}`,
+          file,
+          name: file.name,
+          previewUrl,
+          dataUrl
+        });
+      }
+
+      renderAttachments();
+      event.target.value = "";
+    });
+
+    [participantesEl, pautaEl, relatoEl].forEach((field) => {
+      field.addEventListener("input", updateProgress);
+    });
+
+    generateBtnEl.addEventListener("click", async () => {
+      setMessage("");
+      generateBtnEl.disabled = true;
+      generateBtnEl.textContent = "Gerando PDF...";
+
+      try {
+        await generatePdf();
+        setMessage("PDF gerado com sucesso.", "success");
+      } catch (error) {
+        setMessage(error.message || "Ocorreu um erro ao gerar o PDF.", "error");
+      } finally {
+        generateBtnEl.disabled = false;
+        generateBtnEl.textContent = "Gerar PDF";
+      }
+    });
+
+    updateProgress();
+    renderAttachments();
+  </script>
+</body>
+</html>
